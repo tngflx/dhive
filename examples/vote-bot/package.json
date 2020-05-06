@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "@hivechain/dhive": "^0.8.1"
+  }
+}
