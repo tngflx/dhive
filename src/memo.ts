@@ -5,7 +5,7 @@ import { Types } from "./chain/serializer";
 import * as Aes from "./helpers/aes";
 import { types } from './chain/deserializer'
 
-export function encode(private_key: PrivateKey | string, public_key: PublicKey | string, memo: string, testNonce?: number) {
+function encode(private_key: PrivateKey | string, public_key: PublicKey | string, memo: string, testNonce?: number) {
     if (!/^#/.test(memo)) return memo
     memo = memo.substring(1)
 
@@ -27,7 +27,7 @@ export function encode(private_key: PrivateKey | string, public_key: PublicKey |
     return '#' + bs58.encode(data);
 }
 
-export function decode(private_key: PrivateKey | string, memo: any) {
+function decode(private_key: PrivateKey | string, memo: any) {
     if (!/^#/.test(memo)) return memo
     memo = memo.substring(1)
     // checkEncryption()
@@ -58,6 +58,10 @@ export function decode(private_key: PrivateKey | string, memo: any) {
 const toPrivateObj = o => (o ? o.key ? o : PrivateKey.fromString(o) : o/*null or undefined*/)
 const toPublicObj = o => (o ? o.key ? o : PublicKey.fromString(o) : o/*null or undefined*/)
 
+export const memo = {
+    encode,
+    decode
+}
 //function checkEncryption() {
 //    if (encodeTest === undefined) {
 //        let plaintext;
