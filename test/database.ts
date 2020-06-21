@@ -13,9 +13,9 @@ describe("database api", function () {
     const liveClient = new Client(TEST_NODE, { agent });
 
     let acc: { username: string; password: string };
-    before(async function () {
-        [acc] = await getTestnetAccounts();
-    });
+    //before(async function () {
+    //    [acc] = await getTestnetAccounts();
+    //});
 
     it("getDynamicGlobalProperties", async function () {
         const result = await liveClient.database.getDynamicGlobalProperties();
@@ -70,6 +70,7 @@ describe("database api", function () {
 
     it("getBlockHeader", async function () {
         const result = await client.database.getBlockHeader(1);
+        console.log(result)
         assert.equal("0000000000000000000000000000000000000000", result.previous);
     });
 

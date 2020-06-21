@@ -1,10 +1,7 @@
 {
   "ExpandedNodes": [
     "",
-    "\\src",
-    "\\src\\chain",
-    "\\src\\helpers"
+    "\\src"
   ],
-  "SelectedNode": "\\src\\client.ts",
   "PreviewInSolutionExplorer": false
 }

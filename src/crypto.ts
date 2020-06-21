@@ -38,6 +38,7 @@ import { createHash } from "crypto";
 import * as bs58 from "bs58";
 import * as ByteBuffer from "bytebuffer";
 import * as secp256k1 from "secp256k1";
+import * as hkdf from "futoin-hkdf";
 import { VError } from "verror";
 
 import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from "./client";
@@ -141,11 +142,20 @@ function isCanonicalSignature(signature: Buffer): boolean {
  * ECDSA (secp256k1) public key.
  */
 export class PublicKey {
+  
+  public readonly uncompressed: Buffer;
+  
   constructor(
-    public readonly key: Buffer,
-    public readonly prefix = DEFAULT_ADDRESS_PREFIX
+    public readonly key: any,
+    public readonly prefix = DEFAULT_ADDRESS_PREFIX,
   ) {
+    this.uncompressed = Buffer.from(secp256k1.publicKeyConvert(key, false));
     assert(secp256k1.publicKeyVerify(key), "invalid public key");
+  }
+
+  public static fromBuffer(key: ByteBuffer) {
+    assert(secp256k1.publicKeyVerify(key), "invalid buffer as public key");
+    return { key }
   }
 
   /**
@@ -190,6 +200,16 @@ export class PublicKey {
     return this.toString();
   }
 
+  public decapsulate(priv: PrivateKey): Buffer {
+    const master = Buffer.concat([
+      this.uncompressed,
+      priv.multiply(this),
+    ]);
+    return hkdf(master, 64, {
+      hash: "SHA-512",
+    });
+  }
+
   /**
    * Used by `utils.inspect` and `console.log` in node.js.
    */
@@ -204,7 +224,10 @@ export type KeyRole = "owner" | "active" | "posting" | "memo";
  * ECDSA (secp256k1) private key.
  */
 export class PrivateKey {
+  public secret: Buffer;
+
   constructor(private key: Buffer) {
+    this.secret = key;
     assert(secp256k1.privateKeyVerify(key), "invalid private key");
   }
 
@@ -243,6 +266,24 @@ export class PrivateKey {
   ) {
     const seed = username + role + password;
     return PrivateKey.fromSeed(seed);
+  }
+
+  /**
+   * HMAC based key derivation function
+   * @param pub recipient publickey
+   */
+  public encapsulate(pub: PublicKey): Buffer {
+    const master = Buffer.concat([
+      pub.uncompressed,
+      this.multiply(pub),
+    ]);
+    return hkdf(master, 64, {
+      hash: "SHA-512",
+    });
+  }
+
+  public multiply(pub: any): Buffer {
+    return Buffer.from(secp256k1.publicKeyTweakMul(pub.key, this.secret, false));
   }
 
   /**

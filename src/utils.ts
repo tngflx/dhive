@@ -190,6 +190,9 @@ function serialize(serializer: Serializer, data: any) {
   buffer.flip();
   return Buffer.from(buffer.toBuffer());
 }
+
+
+
 export function buildWitnessUpdateOp(
   owner: string,
   props: WitnessProps
