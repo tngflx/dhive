@@ -1,6 +1,6 @@
 {
   "name": "dhive-mod",
-  "version": "0.13.7",
+  "version": "0.13.6",
   "description": "Hive blockchain RPC client library",
   "author": "tngflx",
   "license": "BSD-3-Clause",
